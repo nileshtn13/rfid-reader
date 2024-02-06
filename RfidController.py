@@ -59,11 +59,11 @@ class RfidReader():
         return self.device_status
 
 
-    def read_tag(self):
+    def __send_request(self):
         bytecode = bytes.fromhex(self.single_polling_inc)
         self.rfid_device.write(bytecode)
 
-    def get_tag_id(self):
+    def __get_tag_id(self):
         data = self.rfid_device.read(40)
         if data.hex() == "bb01ff000115167e":
             self.tag_id = None
@@ -72,4 +72,9 @@ class RfidReader():
                 self.tag_id = data.hex()[16:-8]
             else:
                 self.tag_id = None
-        print(self.tag_id)
+        return True
+
+    def read_tag(self):
+        self.__send_request()
+        self.__get_tag_id
+        return self.tag_id
