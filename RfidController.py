@@ -11,7 +11,6 @@ class RfidReader():
         self.read_time = 1
         self.single_polling_inc = "BB00220000227E"
         self.tag_id = None
-        self.connect_device()
 
     def connect_device(self):
         ports = list(list_ports.comports())
@@ -22,16 +21,20 @@ class RfidReader():
                     self.rfid_device = serial.Serial(port=port.device, baudrate=115200, timeout=1)
                 except serial.SerialException:
                     print("device already open by some other program")
+                    #log above
                 if self.rfid_device.isOpen():
                     self.device_connection = True
                     print("device has connected successfully")
+                    #log above
                     return True
                 else:
                     self.device_status = False
                     print("found device but not able to connect please retry")
+                    #log above
                     return False
             else:
                 print("serial device with name \"CP2102\" device not found")
+                #log above
 
     def disconnect_device(self):
         self.rfid_device.close()
@@ -39,10 +42,12 @@ class RfidReader():
         if not self.rfid_device.isOpen():
             self.device_connection = False
             print("device has disconnected successfully")
+            #log above
             return True
         else:
             self.device_connection = True
             print("could not able to close the device")
+            #log above
             return False
         
     def check_device_serial_conection(self):
@@ -54,9 +59,10 @@ class RfidReader():
         for port in ports:
             if "CP2102" in port.description:
                 self.device_status = True
+                return self.device_status
             else:
-                self.device_status = True
-        return self.device_status
+                self.device_status = False
+                return self.device_status
 
 
     def __send_request(self):
@@ -72,9 +78,13 @@ class RfidReader():
                 self.tag_id = data.hex()[16:-8]
             else:
                 self.tag_id = None
-        return True
 
     def read_tag(self):
-        self.__send_request()
-        self.__get_tag_id
-        return self.tag_id
+        try:
+            self.__send_request()
+            self.__get_tag_id()
+            return self.tag_id
+        except serial.SerialException as e:
+            #log e
+            return None
+        
